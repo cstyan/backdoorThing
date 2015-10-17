@@ -20,6 +20,8 @@ parser.add_argument('-ip'
                    , dest='destIP'
                    , help='Destination IP'
                    , required=True)
+args = parser.parse_args()
+
 command = "ls -l"
 sniffFilter = 'udp and dst port {0} and src port {1}' .format(args.sourcePort, args.destPort)
 packet = IP(dst=args.destIP)/UDP(dport=args.destPort, sport=args.sourcePort)/Raw(load=command)
