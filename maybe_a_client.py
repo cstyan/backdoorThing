@@ -1,4 +1,5 @@
 from scapy.all import *
+import argparse
 
 def packetFunc(packet):
   print packet.load
