@@ -31,7 +31,7 @@ parser.add_argument('-d'
 #                    , dest='interface'
 #                    , help='Interface to sniff for packets on.')
 args = parser.parse_args()
-sniffFilter = "udp and src port {0} and dst port {1}".format(args.sport, args.dport)
+sniffFilter = "udp and src port {0} and dst port {1}".format(args.sourcePort, args.destPort)
 
 def runCommand(packet):
   print "Running command " + packet.load
