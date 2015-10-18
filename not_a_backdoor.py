@@ -40,7 +40,7 @@ MASTER_KEY = '12345678901234567890123456789012'
 def encrypt(thing):
   secret = AES.new(MASTER_KEY)
   tagString = str(thing) + (AES.block_size - len(str(thing)) % AES.block_size) * "\0"
-  cipherText = base64.base64encode(secret.encrypt(tagString))
+  cipherText = base64.b64encode(secret.encrypt(tagString))
   return cipherText
 
 def decrypt(cipher_text):
