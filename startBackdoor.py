@@ -13,5 +13,6 @@ parser.add_argument('-d'
                    , dest='destPort'
                    , help='Destination port sender is sending to.'
                    , required=True)
+args = parser.parse_args()
 
 subprocess.call("nohup python not_a_backdoor.py -s {0} -d {1}".format(args.sourcePort, args.destPort))
