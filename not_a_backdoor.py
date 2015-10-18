@@ -45,7 +45,7 @@ def encrypt(thing):
   cipherText = base64.base64encode(secret.encrypt(tagString))
   return cipherText
 
-def decrypt_val(cipher_text):
+def decrypt(cipher_text):
     dec_secret = AES.new(MASTER_KEY)
     raw_decrypted = dec_secret.decrypt(base64.b64decode(cipher_text))
     clear_val = raw_decrypted.rstrip("\0")
