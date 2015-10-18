@@ -35,8 +35,6 @@ parser.add_argument('-d'
 #                    , help='Interface to sniff for packets on.')
 args = parser.parse_args()
 sniffFilter = "udp and src port {0} and dst port {1}".format(args.sourcePort, args.destPort)
-encryptionObject = AES.new('This is a key123', AES.MODE_CFB, 'This is an IV456')
-decryptionObject = AES.new('This is a key123', AES.MODE_CFB, 'This is an IV456')
 MASTER_KEY = '12345678901234567890123456789012'
 
 def encrypt(thing):

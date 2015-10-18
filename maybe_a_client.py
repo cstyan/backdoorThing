@@ -45,9 +45,13 @@ args = parser.parse_args()
 
 command = "ls -l"
 sniffFilter = 'udp and dst port {0} and src port {1}' .format(args.sourcePort, args.destPort)
-encryptionObject = AES.new('This is a key123', AES.MODE_CFB, 'This is an IV456')
-decryptionObject = AES.new('This is a key123', AES.MODE_CFB, 'This is an IV456')
-encryptedCommand = encrypt(command)
-packet = IP(dst=args.destIP)/UDP(dport=int(args.destPort), sport=int(args.sourcePort))/Raw(load=encryptedCommand)
-send(packet)
-sniff(filter=sniffFilter,prn=packetFunc, count=1)
+while True:
+  command = raw_input("Command? (exit to end) ")
+  if command == "exit":
+    sys.exit()
+  else:
+    encryptedCommand = encrypt(command)
+    packet = IP(dst=args.destIP)/UDP(dport=int(args.destPort), sport=int(args.sourcePort))/Raw(load=encryptedCommand)
+    send(packet)
+    sniff(filter=sniffFilter,prn=packetFunc, count=1)
+
