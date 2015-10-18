@@ -1,5 +1,7 @@
 import argparse
 import subprocess
+import os
+import shlex
 
 # argument parsing
 parser = argparse.ArgumentParser(description="This is definitely not a backdoor.")
@@ -15,4 +17,6 @@ parser.add_argument('-d'
                    , required=True)
 args = parser.parse_args()
 
-subprocess.call("nohup python not_a_backdoor.py -s {0} -d {1}".format(args.sourcePort, args.destPort))
+cwd = os.cwd()
+args = shlex.split("nohup /usr/bin/python not_a_backdoor.py -s {0} -d {1}".format(args.sourcePort, args.destPort))
+subprocess.Popen(args, cwd=cwd)
