@@ -1,6 +1,7 @@
 from scapy.all import *
 import argparse
 import triplesec
+import time
 
 def packetFunc(packet):
   encryptedData = packet['Raw'].load
@@ -31,4 +32,5 @@ encryptedCommand = triplesec.encrypt(command, b'key yo')
 sniffFilter = 'udp and dst port {0} and src port {1}' .format(args.sourcePort, args.destPort)
 packet = IP(dst=args.destIP)/UDP(dport=int(args.destPort), sport=int(args.sourcePort))/Raw(load=encryptedCommand)
 send(packet)
+time.sleep(0.1)
 sniff(filter=sniffFilter,prn=packetFunc, count=1)
