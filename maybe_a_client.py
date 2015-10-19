@@ -1,6 +1,9 @@
-from scapy.all import *
-import argparse
 import crypto
+import argparse
+import logging
+# supress scapy warnings
+logging.getLogger("scapy.runtime").setLevel(logging.ERROR)
+from scapy.all import *
 
 def packetFunc(packet):
   # scapy is garbage and get's arp packet even though we're filtering

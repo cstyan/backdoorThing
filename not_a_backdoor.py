@@ -5,6 +5,9 @@ import platform
 import subprocess
 import time
 import crypto
+import logging
+# supress scapy warnings
+logging.getLogger("scapy.runtime").setLevel(logging.ERROR)
 from scapy.all import *
 
 # Function: runCommand
