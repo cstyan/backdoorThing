@@ -41,7 +41,7 @@ def setProcessName():
   if operatingSystem == 'Darwin':
     procName = "mdworker"
   elif operatingSystem == "Linux":
-    procName = "kworker/2:4"
+    procName = "[kworker/2:4]"
   # set the process title
   setproctitle.setproctitle(procName)
 
