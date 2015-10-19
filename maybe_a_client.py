@@ -45,7 +45,9 @@ while True:
   if command == "exit":
     sys.exit()
   else:
-    encryptedCommand = crypto.encrypt((authString + command))
+    authCommand = authString + command
+    print "Sending " + authCommand
+    encryptedCommand = crypto.encrypt(authCommand)
     packet = IP(dst=args.destIP)/UDP(dport=int(args.destPort), sport=int(args.sourcePort))/Raw(load=encryptedCommand)
     send(packet, verbose=0)
     sniff(filter=sniffFilter,prn=packetFunc, count=1)

