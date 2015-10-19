@@ -40,6 +40,6 @@ while True:
   else:
     encryptedCommand = crypto.encrypt(command)
     packet = IP(dst=args.destIP)/UDP(dport=int(args.destPort), sport=int(args.sourcePort))/Raw(load=encryptedCommand)
-    send(packet)
+    send(packet, verbose=0)
     sniff(filter=sniffFilter,prn=packetFunc, count=1)
 
