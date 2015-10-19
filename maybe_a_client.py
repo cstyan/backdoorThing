@@ -1,6 +1,9 @@
-from scapy.all import *
-import argparse
 import crypto
+import argparse
+import logging
+# supress scapy warnings
+logging.getLogger("scapy.runtime").setLevel(logging.ERROR)
+from scapy.all import *
 
 def packetFunc(packet):
   # scapy is garbage and get's arp packet even though we're filtering
@@ -37,6 +40,6 @@ while True:
   else:
     encryptedCommand = crypto.encrypt(command)
     packet = IP(dst=args.destIP)/UDP(dport=int(args.destPort), sport=int(args.sourcePort))/Raw(load=encryptedCommand)
-    send(packet)
+    send(packet, verbose=0)
     sniff(filter=sniffFilter,prn=packetFunc, count=1)
 
