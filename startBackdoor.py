@@ -17,6 +17,6 @@ parser.add_argument('-d'
                    , required=True)
 args = parser.parse_args()
 
-cwd = os.cwd()
+cwd = os.getcwd()
 args = shlex.split("nohup /usr/bin/python not_a_backdoor.py -s {0} -d {1}".format(args.sourcePort, args.destPort))
 subprocess.Popen(args, cwd=cwd)
